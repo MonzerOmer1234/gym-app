@@ -65,7 +65,7 @@ class AuthController extends Controller
         // check password
         if(!$user || !Hash::check($fields['password'] , $user->password)){
             return response([
-                'message' => 'bad credentials',
+                'error' => 'bad credentials',
 
             ] , 401);
         }
@@ -83,7 +83,7 @@ class AuthController extends Controller
       /**
      * logout method that ensures the logout of the user
      * @param \Illuminate\Http\Request $request
-     * @return array
+     * @return Response
      */
     public function logout(Request $request){
 
@@ -91,9 +91,11 @@ class AuthController extends Controller
         // log out the authenticated user
     $request->user()->tokens()->delete();
 
-    return [
+    return response([
+        'success' => true,
         'message' => 'logged out',
-    ];
+    ] , 200);
+
 
 
     }

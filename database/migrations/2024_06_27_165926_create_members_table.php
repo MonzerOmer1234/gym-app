@@ -14,10 +14,9 @@ return new class extends Migration
 
         Schema::create('members', function (Blueprint $table) {
             $table->id();
-            
             $table->string('name' , 50);
             $table->string('mobile' , 11)->unique();
-            $table->tinyInteger('gender');
+            $table->string('gender');
             $table->enum('blood_group' , ['A+' , 'A-' , 'AB+' , 'AB-' , 'B+' , 'B-' , 'O+' , 'O-']);
             $table->text('address');
             $table->string('photo' , 100);
@@ -26,7 +25,8 @@ return new class extends Migration
             $table->date('end_date')->nullable();
             $table->string('card_no' , 15)->default('0000000000');
             $table->unsignedBigInteger('created_by');
-            $table->tinyInteger('status')->default(0);
+            $table->string('status');
+            $table->string('available_exercises');
             $table->timestamps();
             $table->foreign('created_by')->references('id')->on('users');
         });

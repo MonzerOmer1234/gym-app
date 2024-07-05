@@ -17,9 +17,9 @@ class MemberController extends Controller
     public function index()
     {
         //
-        $members =  Member::all()->paginate(10);
+        $members =  Member::all();
          $success = "the data is received successfully";
-         $fail = "facing errors hile fetching data";
+         $fail = "facing errors while fetching data";
         return response([
 
             'status' => $members ? $success : $fail ,
@@ -37,30 +37,38 @@ class MemberController extends Controller
     {
         //
         $request->validate([
-            'name' => 'required | max:50',
+            'name' => 'required',
             'gender' => 'required',
             'mobile' => 'required | max:11',
             'blood_group' => 'required',
             'address' => 'required',
-            'photo' => 'required | image',
+            'photo' => 'required',
+            'available_exercises' => "required",
+            'status' => 'required',
+            'created_by'=> 'required',
+
+
         ]);
-        $photoName = Str::random().".". $request->photo->getClientOriginalExtension();
-        Storage::disk('public')->putFileAs('member/photo' , $request->photo , $photoName);
+
 
         $member = Member::create([
-            'member_id' => uniqid(),
+
             'name' => $request->name,
             'gender'=> $request->gender,
             'mobile' =>  $request->mobile,
             'address' =>  $request->address,
             'blood_group' => $request->blood_group,
-            'photo' =>  $photoName,
-            'created_by' =>  auth()->user()->id,
+            'photo' =>  $request->photo,
+            'created_by' => $request->created_by,
+            'available_exercises' => $request->available_exercises,
+            "status" => $request->status,
+
+
 
         ]);
-        $member->member_id = date('Y') . str_pad($member->id , 6 , '0' , STR_PAD_LEFT);
 
-        $member->save();
+
+
         return response([
             'message' => 'the member is created successfully',
             'member' => $member,
@@ -80,7 +88,7 @@ class MemberController extends Controller
         if($member){
             return response([
                 'message' => 'the member is fetched successfully',
-                'member' => $member
+                'member' => $member,
             ]) ;
         } else{
             return response([
@@ -92,38 +100,33 @@ class MemberController extends Controller
 
     /**
      * Update the specified resource in storage.
+     * @param Request $request
+     * @param string $id
+     * @return Illuminate\Http\JsonResponse
      */
     public function update(Request $request, string $id)
     {
         $member = Member::find($id);
         if($member){
             $request->validate([
-                'name' => 'required | max:50',
+                'name' => 'required',
                 'gender' => 'required',
                 'mobile' => 'required | max:11',
                 'blood_group' => 'required',
                 'address' => 'required',
+                'available_exercises' => 'required',
                 'photo' => 'nullable',
             ]);
             $member->fill($request->post())->update();
-            if($request->hasFile('photo')){
-                if($member->photo){
-                    $exist = Storage::disk('public')->exists("member/photo/{$member->photo}");
-                    if($exist){
-                        Storage::disk('public')->delete("mmeber/photo/{$member->photo}");
-                    }
-                }
-                $photoName = Str::random() . "." . $request->photo->getClientOriginalExtension();
-                Storage::disk('public')->putFileAs('member/photo', $request->photo, $photoName);
 
 
-                $member->member_id = date('Y') . str_pad($member->id , 6 , '0' , STR_PAD_LEFT);
-                $member->image = $photoName;
-                $member->save();
-            }
+
+
         }
         return response([
+            'success' => true,
             'message' => 'The member is updated successfully',
+            'member' => $member,
         ]);
     }
 
@@ -138,19 +141,17 @@ class MemberController extends Controller
         $member = Member::find($id);
 
         if($member){
-            if($member->photo){
-                $exist = Storage::disk('public')->exists("member/photo/{$member->photo}");
-                if($exist){
-                    Storage::disk('public')->delete("member/photo/{$member->photo}");
-                }
-            }
 
-            $member->delete();
-            return response([
-                'message' => 'the member is deleted successfully',
+        $member->delete();
+        return response([
+            'message' => 'the member is deleted successfully',
             ]);
-        } else{
-            return 'the member is not found';
+
+            }
+         else{
+            return response([
+                'message' => 'The member is not found'
+            ] , 404);
         }
 
     }

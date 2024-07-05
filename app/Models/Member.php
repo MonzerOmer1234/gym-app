@@ -23,8 +23,10 @@ class Member extends Model
         'start_date',
         'end_date',
         'card_no',
+        'status',
+        'available_exercises',
         'created_by',
-        'status'
+
     ];
     public function user(){
         return $this->belongsTo(User::class , 'created_by')->select('id' , 'name');

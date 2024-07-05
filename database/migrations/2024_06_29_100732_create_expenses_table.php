@@ -16,10 +16,10 @@ return new class extends Migration
             $table->string('name' , 200);
             $table->decimal('amount');
             $table->date('date');
-            $table->tinyInteger('type');
+            $table->string('type');
             $table->unsignedBigInteger('created_by');
             $table->timestamps();
-            
+            $table->softDeletes();
 
             $table->foreign('created_by')->references('id')->on('users');
         });
